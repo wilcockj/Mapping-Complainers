@@ -1,4 +1,4 @@
 venv
 .vscode
-.zip
-.csv
+*.zip
+*.csv
