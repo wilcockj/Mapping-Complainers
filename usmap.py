@@ -1,11 +1,65 @@
 import geopandas
 import matplotlib.pyplot as plt
 import pandas as pd
+import requests
+import zipfile
+import os.path
+from os import path
+import sys
 #maybe get shapefile from us module
-usa = geopandas.read_file("states.shp")
+usa = geopandas.read_file("states_21basic/states.shp")
 #world = geopandas.read_file(geopandas.datasets.get_path('nybb'))
 #numberofcomplaints/populations
+def query_yes_no(question, default="yes"):
+    """Ask a yes/no question via raw_input() and return their answer.
 
+    "question" is a string that is presented to the user.
+    "default" is the presumed answer if the user just hits <Enter>.
+        It must be "yes" (the default), "no" or None (meaning
+        an answer is required of the user).
+
+    The "answer" return value is True for "yes" or False for "no".
+    """
+    valid = {"yes": True, "y": True, "ye": True,
+             "no": False, "n": False}
+    if default is None:
+        prompt = " [y/n] "
+    elif default == "yes":
+        prompt = " [Y/n] "
+    elif default == "no":
+        prompt = " [y/N] "
+    else:
+        raise ValueError("invalid default answer: '%s'" % default)
+
+    while True:
+        sys.stdout.write(question + prompt)
+        choice = input().lower()
+        if default is not None and choice == '':
+            return valid[default]
+        elif choice in valid:
+            return valid[choice]
+        else:
+            sys.stdout.write("Please respond with 'yes' or 'no' "
+                             "(or 'y' or 'n').\n")
+def download_file(url):
+    local_filename = 'complaints.csv.zip'
+    # NOTE the stream=True parameter below
+    with requests.get(url, stream=True) as r:
+        r.raise_for_status()
+        total_length = r.headers.get('content-length')
+        with open(local_filename, 'wb') as f:
+            dl = 0
+            total_length = int(total_length)
+            for chunk in r.iter_content(chunk_size=8192): 
+                # If you have chunk encoded response uncomment if
+                # and set chunk_size parameter to None.
+                #if chunk: 
+                dl += len(chunk)
+                f.write(chunk)
+                done = int(50 * dl / total_length)
+                sys.stdout.write("\r[%s%s]" % ('=' * done, ' ' * (50-done)) )    
+                sys.stdout.flush()
+    return local_filename
 #nybb naturalearth_cities natural_earth_lowres
 #world.head()
 print(usa)
@@ -26,19 +80,29 @@ populationbystate = [4903185,731545,7278717,3017825,39512223,5758735,3565287,705
                     1068778,1934408,3080156,1359711,8882190,2096829,19453561,10488084,762062,11689100,
                     3956971,4217737,12801989,1059361,5148714,884659,6833659,28995881,3205958,623989,
                     8535519,7614893,1787147,5822434,578759]
-
+if not path.isfile('complaints.csv'):
+    if query_yes_no("Would you like to download the complaints dataset. It will be abotu 1.1gb once extracted."):
+        print("Downloading File")
+        download_file('https://files.consumerfinance.gov/ccdb/complaints.csv.zip')
+        print("Extracting File")
+        with zipfile.ZipFile('complaints.csv.zip', 'r') as zip_ref:
+            zip_ref.extractall('.')
+    else:
+        print("Can't continue without downloading dataset")
+        exit()
 complaintsdb = pd.read_csv("complaints.csv")
 
 for x in complaintsdb['State']:
     if x in states:
         states[x] = states[x]+1
 for count,x in enumerate(states2):
-    print(states[x])
+    #print(states[x])
     states[x] = (states[x]/populationbystate[count])*100000
 fig,ax = plt.subplots(figsize=(30,30))
+'''
 for x in range(50):
     print("%s : %d" % (states2[x],populationbystate[x]))
-
+'''
 dfObj = pd.DataFrame(list(states.items()), index = states2)
 dfObj.columns = ['STATE_ABBR','numcomplaints']
 dfObj = dfObj.drop(['AK','HI','DC'])
