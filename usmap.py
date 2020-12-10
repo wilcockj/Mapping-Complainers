@@ -81,7 +81,7 @@ populationbystate = [4903185,731545,7278717,3017825,39512223,5758735,3565287,705
                     3956971,4217737,12801989,1059361,5148714,884659,6833659,28995881,3205958,623989,
                     8535519,7614893,1787147,5822434,578759]
 if not path.isfile('complaints.csv'):
-    if query_yes_no("Would you like to download the complaints dataset. It will be abotu 1.1gb once extracted."):
+    if query_yes_no("Would you like to download the complaints dataset. It will be about 1.1gb once extracted."):
         print("Downloading File")
         download_file('https://files.consumerfinance.gov/ccdb/complaints.csv.zip')
         print("Extracting File")
