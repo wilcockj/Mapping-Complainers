@@ -63,7 +63,6 @@ def download_file(url):
     return local_filename
 #nybb naturalearth_cities natural_earth_lowres
 #world.head()
-print(usa)
 
 states = {"AL":0, "AK":0, "AZ":0, "AR":0, "CA":0, "CO":0, "CT":0, "DC":0, "DE":0, "FL":0, "GA":0, 
           "HI":0, "ID":0, "IL":0, "IN":0, "IA":0, "KS":0, "KY":0, "LA":0, "ME":0, "MD":0, 
