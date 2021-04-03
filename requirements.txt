@@ -34,4 +34,4 @@ Shapely @ file:///C:/Users/James/pipwin/Shapely-1.7.1-cp38-cp38-win_amd64.whl
 six==1.15.0
 soupsieve==2.0.1
 tzlocal==2.1
-urllib3==1.26.2
+urllib3==1.26.3
